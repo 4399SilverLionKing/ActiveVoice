@@ -1,0 +1,49 @@
+# =======================================================
+# Python / Langchain 项目
+# =======================================================
+
+# 虚拟环境
+/venv/
+/.venv/
+/env/
+/virtualenv/
+.env
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 分发/打包
+/build/
+/develop-eggs/
+/dist/
+/downloads/
+/eggs/
+/.eggs/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/var/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.spec
+
+# 测试
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Mypy cache
+.mypy_cache/
