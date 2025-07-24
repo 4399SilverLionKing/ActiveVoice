@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useWebSocketManager } from '@/hooks/WebSocketManagerHook';
 import { WebSocketStatus } from '@/types/WebSocketType';
 
-const DEFAULT_WS_URL = 'ws://localhost:8765';
+const DEFAULT_WS_URL = 'ws://localhost:8000/ws/conversation';
 
 export const WebSocketManager: React.FC = () => {
   const [wsUrl, setWsUrl] = useState(DEFAULT_WS_URL);
