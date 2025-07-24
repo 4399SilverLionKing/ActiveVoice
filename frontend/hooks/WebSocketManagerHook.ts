@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { WebSocketStatus } from '@/types/WebSocketType';
-import type {
-  UseWebSocketManagerReturn,
-  WebSocketMessage,
-} from '@/types/WebSocketType';
+import type { UseWebSocketManagerReturn } from '@/types/WebSocketType';
 
 export const useWebSocketManager = (): UseWebSocketManagerReturn => {
   const [status, setStatus] = useState<WebSocketStatus>(
     WebSocketStatus.DISCONNECTED
   );
-  const [messages, setMessages] = useState<WebSocketMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
@@ -80,31 +76,8 @@ export const useWebSocketManager = (): UseWebSocketManagerReturn => {
         };
 
         ws.onmessage = event => {
-          try {
-            const data = JSON.parse(event.data);
-            const message: WebSocketMessage = {
-              id:
-                Date.now().toString() +
-                Math.random().toString(36).substring(2, 11),
-              timestamp: Date.now(),
-              type: 'received',
-              data,
-            };
-
-            setMessages(prev => [...prev, message]);
-          } catch {
-            // 如果不是JSON格式，直接存储原始数据
-            const message: WebSocketMessage = {
-              id:
-                Date.now().toString() +
-                Math.random().toString(36).substring(2, 11),
-              timestamp: Date.now(),
-              type: 'received',
-              data: event.data,
-            };
-
-            setMessages(prev => [...prev, message]);
-          }
+          // 消息接收处理 - 可以在这里添加语音模块需要的消息处理逻辑
+          console.log('WebSocket message received:', event.data);
         };
 
         ws.onerror = event => {
@@ -133,7 +106,7 @@ export const useWebSocketManager = (): UseWebSocketManagerReturn => {
     setError(null);
   }, [cleanup]);
 
-  // 发送消息
+  // 发送消息 (供其他组件使用，如语音模块)
   const sendMessage = useCallback((data: unknown) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       setError('WebSocket is not connected');
@@ -144,25 +117,11 @@ export const useWebSocketManager = (): UseWebSocketManagerReturn => {
       const messageData =
         typeof data === 'string' ? data : JSON.stringify(data);
       wsRef.current.send(messageData);
-
-      const message: WebSocketMessage = {
-        id: Date.now().toString() + Math.random().toString(36).substring(2, 11),
-        timestamp: Date.now(),
-        type: 'sent',
-        data,
-      };
-
-      setMessages(prev => [...prev, message]);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message');
       console.error('Failed to send message:', err);
     }
-  }, []);
-
-  // 清空消息
-  const clearMessages = useCallback(() => {
-    setMessages([]);
   }, []);
 
   // 组件卸载时清理
@@ -176,8 +135,6 @@ export const useWebSocketManager = (): UseWebSocketManagerReturn => {
     connect,
     disconnect,
     sendMessage,
-    messages,
-    clearMessages,
     error,
     currentUrl,
   };

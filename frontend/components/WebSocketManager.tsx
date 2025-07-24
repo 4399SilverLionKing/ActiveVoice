@@ -2,12 +2,11 @@
 
 import React, { useState } from 'react';
 
-import { Circle, Send, Trash2, Wifi, WifiOff } from 'lucide-react';
+import { Circle, Wifi, WifiOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useWebSocketManager } from '@/hooks/WebSocketManagerHook';
 import { WebSocketStatus } from '@/types/WebSocketType';
 
@@ -15,18 +14,9 @@ const DEFAULT_WS_URL = 'ws://localhost:8000/ws/conversation';
 
 export const WebSocketManager: React.FC = () => {
   const [wsUrl, setWsUrl] = useState(DEFAULT_WS_URL);
-  const [messageInput, setMessageInput] = useState('');
 
-  const {
-    status,
-    isConnected,
-    connect,
-    disconnect,
-    sendMessage,
-    messages,
-    clearMessages,
-    currentUrl,
-  } = useWebSocketManager();
+  const { status, isConnected, connect, disconnect, currentUrl } =
+    useWebSocketManager();
 
   const handleConnect = () => {
     if (wsUrl.trim()) {
@@ -36,24 +26,6 @@ export const WebSocketManager: React.FC = () => {
 
   const handleDisconnect = () => {
     disconnect();
-  };
-
-  const handleSendMessage = () => {
-    try {
-      // 尝试解析为JSON，如果失败则作为普通字符串发送
-      const data = JSON.parse(messageInput);
-      sendMessage(data);
-    } catch {
-      sendMessage(messageInput);
-    }
-    setMessageInput('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
   };
 
   const getStatusColor = () => {
@@ -80,17 +52,6 @@ export const WebSocketManager: React.FC = () => {
       default:
         return '未连接';
     }
-  };
-
-  const formatMessageData = (data: unknown): string => {
-    if (typeof data === 'string') {
-      return data;
-    }
-    return JSON.stringify(data, null, 2);
-  };
-
-  const formatTimestamp = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleTimeString();
   };
 
   return (
@@ -147,82 +108,6 @@ export const WebSocketManager: React.FC = () => {
               </Button>
             </div>
           </div>
-
-          {/* 消息发送区域 */}
-          {isConnected && (
-            <div className="space-y-3 border-t pt-4">
-              <Label htmlFor="message-input">发送消息</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="message-input"
-                  type="text"
-                  value={messageInput}
-                  onChange={e => setMessageInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="输入消息 (支持 JSON 格式)"
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!messageInput.trim()}
-                  className="flex items-center gap-2"
-                >
-                  <Send className="h-4 w-4" />
-                  发送
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* 消息历史区域 */}
-          {isConnected && (
-            <div className="space-y-3 border-t pt-4">
-              <div className="flex items-center justify-between">
-                <Label>消息历史</Label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={clearMessages}
-                  disabled={messages.length === 0}
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  清空
-                </Button>
-              </div>
-
-              <div className="max-h-96 space-y-2 overflow-y-auto rounded-md border bg-gray-50 p-3">
-                {messages.length === 0 ? (
-                  <div className="text-muted-foreground py-4 text-center text-sm">
-                    暂无消息
-                  </div>
-                ) : (
-                  messages.map(message => (
-                    <div
-                      key={message.id}
-                      className={`rounded p-2 text-sm ${
-                        message.type === 'sent'
-                          ? 'ml-8 bg-blue-100 text-blue-900'
-                          : 'mr-8 bg-green-100 text-green-900'
-                      }`}
-                    >
-                      <div className="mb-1 flex items-center justify-between">
-                        <span className="font-medium">
-                          {message.type === 'sent' ? '发送' : '接收'}
-                        </span>
-                        <span className="text-xs opacity-70">
-                          {formatTimestamp(message.timestamp)}
-                        </span>
-                      </div>
-                      <pre className="font-mono text-xs whitespace-pre-wrap">
-                        {formatMessageData(message.data)}
-                      </pre>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

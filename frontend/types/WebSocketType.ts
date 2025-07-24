@@ -49,10 +49,8 @@ export interface UseWebSocketManagerReturn {
   connect: (url: string) => void;
   disconnect: () => void;
 
-  // 消息管理
+  // 消息管理 (供其他组件使用，如语音模块)
   sendMessage: (data: unknown) => void;
-  messages: WebSocketMessage[];
-  clearMessages: () => void;
 
   // 错误信息
   error: string | null;
